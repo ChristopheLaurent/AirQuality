@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Last {{ channel }} [{{ unit }}] for <a href="{{ url_for('raw_sensor', serial_number=serial_number) }}">{{ serial_number }}</a></h1>
+<h2><a href="{{ url_for('graph_channel',serial_number=serial_number, channel=channel) }}">graph</a></h2>
+<table id="data" class="table table-striped">
+<thead>
+  <tr>
+	<th>Date</th>
+	<th>Measure</th>
+  </tr>
+</thead>
+<tbody>
+  {% for measure in measures %}
+	<tr>
+	  <td>{{ measure[0] }}</td>
+	  <td>{{ measure[1] }}</td>
+	</tr>
+  {% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}- Chart</title>
+	<script src="{{ url_for('static', filename='chart.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='chartjs-adapter-date-fns.bundle.min.js') }}"></script>
+	<script>
+	const palette = ["rgb(75, 192, 192)", "rgb(255, 0, 0)", "rgb(0, 0, 255)", "rgb(255, 0, 255)", "rgb(128, 0, 0)", "rgb(0, 255, 0)"]
+	function getPaletteColor(index) {
+		return palette[index%palette.length];
+	}
+	</script>
+	<link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('raw') }}">Last raw data</a>
+        <a href="#">About</a>
+    </nav>
+    <hr>
+    <div class="content">
+        {% block content %} {% endblock %}
+    </div>
+</body>
+</html>

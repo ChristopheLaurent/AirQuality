@@ -1,0 +1,29 @@
+{% extends 'graph_base.html' %}
+
+{% block content %}
+<h1>{{ channel }} [{{ unit }}] graph for <a href="{{ url_for('raw') }}/{{ serial_number }}">{{ serial_number }}</a></h1>
+
+<canvas id="lineChart" width="900" height="400"></canvas>
+<script>
+	var ctx = document.getElementById("lineChart").getContext("2d");
+	var lineChart = new Chart(ctx, {
+		type: "line",
+		data: {
+			labels: {{ time_stamps | safe }},
+			datasets: [
+				{
+					label: "{{ channel }}",
+					data: {{ values | safe }},
+					fill: false,
+					borderColor: "rgb(75, 192, 192)",
+					lineTension: 0.1
+				}
+			]
+		},
+		option: {
+			responsive: false
+		}
+	});
+</script>
+
+{% endblock %}

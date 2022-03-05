@@ -1,0 +1,45 @@
+{% extends 'graph_base.html' %}
+
+{% block content %}
+<h1>Graph for <a href="{{ url_for('raw_sensor', serial_number=serial_number) }}">{{ serial_number }}</a></h1>
+
+<canvas id="scatterChart" width="900" height="400"></canvas>
+<script>
+	var ctx = document.getElementById("scatterChart").getContext("2d");
+	var scatterChart = new Chart(ctx, {
+		type: "scatter",
+		data: {
+			datasets: [
+			{% for dataset in datasets %}
+				{
+					label: "{{ dataset.name + '[' + dataset.unit + ']' }}",
+					yAxisID:'{{ dataset.name }}',
+					data: {{ dataset.data | safe }}, <!-- safe is mandatory else jinja converts the quotes to ascii code -->
+					showLine: true,
+					fill: false,
+					borderColor: getPaletteColor({{loop.index}}),
+					lineTension: 0.1
+				},
+			{% endfor %}
+			]
+		},
+		options: {
+			scales:{
+				x: {
+					type: 'time'
+				},
+				yAxes: [
+				{% for dataset in datasets %}
+					{
+						id: '{{ dataset.name }}',
+						type: 'linear',
+						position: 'left',
+					},
+				{% endfor %}
+				]
+			}
+		}
+	});
+</script>
+
+{% endblock %}

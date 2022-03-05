@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Last raw data for {{ serial_number }}</h1>
+<h2>Graph for <a href="{{ url_for('graph_sensor', serial_number=serial_number) }}">{{ serial_number }}</a></h2>
+
+<table id="data" class="table table-striped">
+<thead>
+  <tr>
+	<th>Date</th>
+	<th>Name</th>
+	<th>Measure</th>
+	<th>Unit</th>
+  </tr>
+</thead>
+<tbody>
+  {% for measure in measures %}
+	<tr>
+	  <td>{{ measure[0] }}</td>
+	  <td><a href="{{ url_for('raw') }}/{{ serial_number }}/{{ measure[1] }}">{{ measure[1] }}</a></td>
+	  <td>{{ measure[2] }}</td>
+	  <td>{{ measure[3] }}</td>
+	</tr>
+  {% endfor %}
+</tbody>
+</table>
+
+{% endblock %}
