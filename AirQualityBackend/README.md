@@ -34,7 +34,6 @@ Run as admin windows power shell then type the following commands:
 -	$env:FLASK_APP = "app"
 -	flask run --host=0.0.0.0
 -	Open your favorite browser then go to [http://127.0.0.1:5000/raw](http://127.0.0.1:5000/raw). You should see an empty table:
-
 ![image](https://user-images.githubusercontent.com/20434204/159179162-9971dff5-f468-49b9-a144-a2a41ee92656.png)
 
 

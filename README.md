@@ -8,7 +8,7 @@ The device displays CO2 level with a smiley depending on the CO2 level, so it ca
 
 ![image](https://user-images.githubusercontent.com/20434204/156890097-6f668abd-a406-48f5-88e0-f4490e710f5c.png)
 
-The device is based on 2 circuits, connected via I2C in a 3D printed casing:
+The device is based on 2 circuits, connected via I2C in a [3D printed casing](https://github.com/ChristopheLaurent/AirQuality/tree/main/Model3D):
 ### [Sensirion SCD41](https://developer.sensirion.com/sensirion-products/scd4x-co2-sensors/)
 The SEK-SCD41-Sensor Evaluation Kit can measure CO2 level, Humidity and Temperature. It is powered in 3.3V. The sampling rate is 5s in normal mode, 30s in low power mode.
 ### [LILYGO® TTGO T5 V2.3.1_2.13](http://www.lilygo.cn/prod_view.aspx?TypeId=50061&Id=1393&FId=t3:50061:3) 
