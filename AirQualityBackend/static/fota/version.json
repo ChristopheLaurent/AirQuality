@@ -1,6 +1,6 @@
 {
     "type": "AirQ",
-    "version": 4,
+    "version": 6,
     "host": "192.168.1.108",
     "port": 5000,
     "bin": "/fota"

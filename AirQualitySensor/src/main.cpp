@@ -1,3 +1,5 @@
+// Air quality main source code
+
 #include "Screen.h"
 #include <Wire.h>
 #include <WiFi.h>
@@ -10,27 +12,27 @@
 #include "TimeKeeper.h"
 // #include <esp_arduino_version.h> // works from V2
 
-#define BUTTON_1                (39)
+#define BUTTON_1                (39) // pin for button1 used for wake up
 
-#define CO2_WIFI_ENABLED 1
+#define CO2_WIFI_ENABLED 1           // 1 to enable WiFi
 
-#define FIRMWARE_VERSION 4
-const char* firmwareName = "AirQ";
+#define FIRMWARE_VERSION 6           // firmware version. should match AirQualityBackend/static/fota/version.h
+const char* firmwareName = "AirQ";   // firmware name. should match AirQualityBackend/static/fota/version.h
 
 esp_sleep_source_t wakeupReason;
-RTC_DATA_ATTR int bootCount = 0;
-RTC_DATA_ATTR int wifiConnectionFailures = 0;
+RTC_DATA_ATTR int bootCount = 0;     // keep tracks of boot from wake up
+RTC_DATA_ATTR int wifiConnectionFailures = 0; // keep track of wifi connection failures to avoid spending battery when no wifi
 int loopCount = 0;
 
 const char* formatDateTime = "%d %b %H:%M:%S";
-TimeKeeper timeKeeper;
-Screen ePaper;
-Sensor sensor;
-Battery battery;
-SdCard sdCard(&timeKeeper);
+TimeKeeper timeKeeper; // class to keep track of time
+Screen ePaper; // class to handle GUI
+Sensor sensor; // class to handle sensor
+Battery battery; // class to handle battery monitoring
+SdCard sdCard(&timeKeeper); // class to handle storage of measures on sd card
 esp32FOTA esp32FOTA(String(firmwareName), FIRMWARE_VERSION, false);
 
-// WiFi
+// TODO: avoid hard coded WiFi & mosquitto credentials
 const char* server = "http://192.168.1.108:5000/";
 const char* ssid="TP-Link_CD96";
 const char *password ="24232876";
@@ -42,6 +44,7 @@ MqttClient *mqttClient = NULL;
 WiFiClient wifiClient;
 PubSubClient pubSubClient(wifiClient);
 
+// scan wifi access point for test purpose. Not used.
 void testWiFi()
 {
     WiFi.mode(WIFI_STA);
@@ -70,6 +73,7 @@ void testWiFi()
     Serial.println("");
 }
 
+// set the current time
 int setTime(double timeStamp) // seconds since epoch including ms as decimals
 {
   log_v("Got time %s", timeKeeper.toDate(timeStamp));
@@ -77,6 +81,7 @@ int setTime(double timeStamp) // seconds since epoch including ms as decimals
   return 1;
 }
 
+// disbale Wifi when not needed to save battery
 void disableWifi()
 {
   // reduce power: https://www.mischianti.org/2021/03/06/esp32-practical-power-saving-manage-wifi-and-cpu-1/
@@ -100,6 +105,7 @@ void disableWifi()
   WiFi.mode(WIFI_OFF);   // turn off wifi
 }
 
+// start Wifi/MQTT connection
 void wifiConnection()
 {
   WiFi.softAPdisconnect();
@@ -147,6 +153,7 @@ void wifiConnection()
   }
 
   log_d("Init mqtt");
+// TODO: handle TLS
   mqttClient = new MqttClient();
 
   mqttClient->setTimeCB = &(setTime);
@@ -156,6 +163,7 @@ void wifiConnection()
   log_d("mqtt initialized");
 }
 
+// Check chip id for test purpose.
 void checkChip()
 {
   esp_chip_info_t chip_info;
@@ -179,6 +187,7 @@ void checkChip()
   log_v ("MAC: %s\n", macString);
 }
 
+// Go to deep sleep for a time.
 void sleep(int seconds)
 {
     ePaper.powerDown();
@@ -199,6 +208,7 @@ void sleep(int seconds)
     esp_deep_sleep_start();
 }
 
+// the startup function called once by Arduino on boot
 void setup()
 {
     Serial.begin(9600);
@@ -261,6 +271,7 @@ void setup()
     }
 }
 
+// the loop function called forever by Arduino framework after setup
 void loop()
 {
   battery.measure();
@@ -328,7 +339,8 @@ void loop()
 
   if (sensor.getMode() == SENSOR_LOW_POWER)
   {
-    sleep(60);
+    sleep(60); 
+    // we do not got continue beyond this point since sleep with ends up in setup 1 min later
   }
 
   if (sensor.getMode() == SENSOR_NORMAL && loopCount > 10)
@@ -337,5 +349,5 @@ void loop()
   }
 
   loopCount++;
-  delay(5000);
+  delay(5000); // wait 5 s since in normal mode, we get a measure every 5 s.
 }
