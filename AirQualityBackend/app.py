@@ -1,7 +1,10 @@
-import psycopg2 # postgres
+# AirQuality server
+
+import psycopg2
 import json
 import math
 import io
+import os
 from db_api import *
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_mqtt import Mqtt
@@ -16,6 +19,9 @@ app.config['MQTT_PASSWORD'] = ''  # set the password here if the broker demands 
 app.config['MQTT_KEEPALIVE'] = 5  # set the time interval for sending a ping to the broker to 5 seconds
 app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purposes
 
+sensor_type = 'SCD41' # hard coded for the time being
+
+# handle mqtt
 sensor_ids = []
 
 try:
@@ -23,16 +29,25 @@ try:
     
     @mqtt.on_connect()
     def handle_connect(client, userdata, flags, rc):
+        """
+        connect flask server to mqtt broker.
+        """
         print("CLIENT CONNECTED")
         mqtt.subscribe('AirQuality/#') # multi level wildcard => subscribe to everything from AirQuality sensors
         publishTime()
 
     @mqtt.on_disconnect()
     def handle_disconnect():
+        """
+        disconnect flask server to mqtt broker
+        """
         print("CLIENT DISCONNECTED")
 
     @mqtt.on_message()
     def handle_mqtt_message(client, userdata, message):
+        """
+        handle new subscribed message
+        """
         payload=message.payload.decode()
         time_stamp = datetime.now(timezone.utc)
         print(payload)
@@ -57,28 +72,38 @@ try:
 except:
     print ('Unable to connect to mqtt broker ',app.config['MQTT_BROKER_URL'])
 
-sensor_type = 'SCD41' # hard coded for the time being
-firmware_folder = r'C:\Users\LaurentC\Documents\PlatformIO\Projects\CO2_epaper'
+#handle firmware OTA
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 @app.route('/check_fota', methods=['GET'])
 def check_fota():
-    with open(firmware_folder + r'\src\fota.json', 'r') as f:
+    """
+    returns the current firmware version
+    """
+    with open(os.path.join(basedir, 'static/fota/version.json'), 'r') as f:
         firmware = json.loads(f.read())
     print(firmware)
     return jsonify(firmware)
 
 @app.route('/fota', methods=['GET'])
 def fota():
-    """Serves the binary firmware."""
-    with open(firmware_folder + r'\.pio\build\esp32dev\firmware.bin', 'rb') as bites:
+    """
+    Serves the binary firmware.
+    """
+    with open(os.path.join(basedir, 'static/fota/firmware.bin'), 'rb') as bites:
+#TODO: We may add a signature to the firmware binary to ensure it comes from the right source.
         return send_file(
                      io.BytesIO(bites.read()),
                      attachment_filename='firmware.bin',
                      mimetype='application/octet-stream'
                )
 
+#handle WEB access
 @app.route('/raw')
 def raw():
+    """
+    Displays last 100 measures in a table for all sensors.
+    """
     conn = get_db_connection()
     measures = getLastMeasures(conn)
     conn.close()
@@ -86,6 +111,9 @@ def raw():
 
 @app.route('/raw/<serial_number>')
 def raw_sensor(serial_number):
+    """
+    Displays last 100 measures in a table for a specific sensor.
+    """
     conn = get_db_connection()
     measures = getLastSensorMeasures(conn, sensor_type, serial_number)
     conn.close()
@@ -93,6 +121,9 @@ def raw_sensor(serial_number):
 
 @app.route('/graph/<serial_number>')
 def graph_sensor(serial_number):
+    """
+    Displays last 1000 measures in a table for a specific sensor.
+    """
     print ('graph_sensor (',serial_number,')')
     conn = get_db_connection()
     cur = conn.cursor()
@@ -108,6 +139,9 @@ def graph_sensor(serial_number):
 
 @app.route('/raw/<serial_number>/<channel>')
 def raw_channel(serial_number, channel):
+    """
+    Displays last 100 measures in a table for a specific sensor and a specific channel.
+    """
     print ('raw_channel (',serial_number,',',channel,')')
     conn = get_db_connection()
     measures, unit = getLastChannelMeasures(conn, sensor_type, serial_number, channel)
@@ -116,6 +150,9 @@ def raw_channel(serial_number, channel):
 
 @app.route('/graph/<serial_number>/<channel>')
 def graph_channel(serial_number, channel):
+    """
+    Displays last 1000 measures in a graph for a specific sensor and a specific channel.
+    """
     print ('graph_channel (',serial_number,',',channel,')')
     conn = get_db_connection()
     cur = conn.cursor()

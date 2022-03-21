@@ -1,14 +1,12 @@
+# Create AirQuality project tables
+# It assumes that AirQuality database itself is already created (using pgAdmin for example)
+
 import psycopg2
+from db_api import *
 import datetime
 
-conn = psycopg2.connect(
-        host="localhost",
-        database="AirQuality",
-        user='postgres', #os.environ['PGLogin'],
-        password='admin' #os.environ['PGPassword']
-        )
+conn = conn = get_db_connection()
 
-# Open a cursor to perform database operations
 cur = conn.cursor()
 
 # Creates new tables
@@ -59,7 +57,6 @@ cur.execute('CREATE TABLE measures (sensor integer REFERENCES sensors (id),'
 cur.execute('INSERT INTO sensor_types (sensor_type, description)'
             'VALUES (%s, %s)',
             ('SCD41', 'CO2 Sensor from Sensirion'))
-
 cur.execute('INSERT INTO channels (sensor_type, name, unit, description)'
             'VALUES (%s, %s, %s, %s)',
             ('SCD41', 'CO2', 'ppm', 'CO2 concentration'))
