@@ -12,7 +12,8 @@ from datetime import datetime, timezone
 import time
 
 app = Flask(__name__)
-app.config['MQTT_BROKER_URL'] = '192.168.1.108'  # use the local mosquitto broker
+# TODO Find a way to setup MQTT credentials properly.
+app.config['MQTT_BROKER_URL'] = '127.0.0.1'  # use the local mosquitto broker
 app.config['MQTT_BROKER_PORT'] = 1883  # default port for non-tls connection
 app.config['MQTT_USERNAME'] = ''  # set the username here if you need authentication for the broker
 app.config['MQTT_PASSWORD'] = ''  # set the password here if the broker demands authentication
@@ -52,6 +53,7 @@ try:
         time_stamp = datetime.now(timezone.utc)
         print(payload)
         topic_items = message.topic.split('/')
+#TODO: Fix crash in case of wrong topic, this could be an attack
         conn = get_db_connection()
         sensor_id = getOrInsertSensor(conn, sensor_type, topic_items[1])
         if (topic_items[2] == 'Measure' or topic_items[2] == 'Monitoring'):
@@ -97,6 +99,7 @@ def fota():
                      attachment_filename='firmware.bin',
                      mimetype='application/octet-stream'
                )
+#TODO: Fix crash in case of missing file for some reason
 
 #handle WEB access
 @app.route('/raw')

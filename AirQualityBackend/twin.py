@@ -42,9 +42,10 @@ def on_message(client, userdata, message):
 
 print ('start digital twin ' + serial_number)
 mqttc =  mqtt.Client(serial_number)
-mqttc.connect("192.168.1.108", 1883, 60)
-mqttc.on_connect= on_connect                      #attach function to callback
-mqttc.on_message= on_message                      #attach function to callback
+
+mqttc.connect("127.0.0.1", 1883, 60) # TODO Put address of external broker to simulate an attack
+mqttc.on_connect= on_connect
+mqttc.on_message= on_message
 
 mqttc.loop_start()
 try:
