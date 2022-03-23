@@ -34,7 +34,7 @@ def on_message(client, userdata, message):
         for key, value in data.items(): 
             if (key == 'now'): 
                 time_stamp = datetime.fromtimestamp(value)
-                print ("Received refernce time " + time_stamp.strftime("%H:%M:%S") + " current time is " + datetime.now(timezone.utc).strftime("%H:%M:%S"))
+                print ("Received reference time " + time_stamp.strftime("%H:%M:%S") + " current time is " + datetime.now(timezone.utc).strftime("%H:%M:%S"))
             else:
                 print ("Unknown property " + key)
     else:
