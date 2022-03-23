@@ -37,7 +37,13 @@ Run as admin windows power shell then type the following commands:
 
 ![image](https://user-images.githubusercontent.com/20434204/159179162-9971dff5-f468-49b9-a144-a2a41ee92656.png)
 
--	In another power shell, execute `python twin.py` . This will run a digital twin that simulates a sensor to populate the data base. If you refresh your browser, you should then see some data :
+-	In another power shell, execute `python twin.py` . This will run a digital twin that simulates a sensor to populate the data base. If you refresh your browser, you should then see some data:
+
+![image](https://user-images.githubusercontent.com/20434204/159666253-7285c726-4cbc-4335-977a-a67417c22540.png)
+
+- You can then navigate up to the graphics:
+
+![image](https://user-images.githubusercontent.com/20434204/159671482-28f9e83b-d707-4638-87e1-16c619863682.png)
 
 
 
